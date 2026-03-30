@@ -40,4 +40,9 @@ class AppColors {
   static const Color primary10 = Color(0x1A5ED5A8);
   static const Color error16 = Color(0x29DD4B4B);
   static const Color overlay50 = Color(0x80161C22);
+
+  // --- Auth & Inputs ---
+  static const Color toggleBackground = Color(0xFF212931);
+  static const Color toggleActive = Color(0xFF1B232A);
+  static const Color inputFillColor = Color(0xFF212931);
 }

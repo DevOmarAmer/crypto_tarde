@@ -70,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.logout,
               title: 'Logout',
               color: AppColors.error,
-              onTap: () => context.go(AppRouter.login),
+              onTap: () => context.go(AppRouter.auth),
             ),
           ],
         ),

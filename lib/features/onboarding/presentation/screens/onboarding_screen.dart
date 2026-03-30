@@ -8,7 +8,7 @@ import '../../../../core/routes/app_router.dart';
 import '../../../../core/widgets/custom_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -135,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 : AppStrings.next,
             onPressed: () {
               if (_currentIndex == _pages.length - 1) {
-                context.go(AppRouter.login);
+                context.go(AppRouter.auth);
               } else {
                 _pageController.nextPage(
                   duration: const Duration(milliseconds: 300),
