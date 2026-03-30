@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -93,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             page.title,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: AppColors.textPrimary,
+              color: AppColors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
@@ -103,7 +103,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             page.subtitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: AppColors.textSecondary,
+              color: AppColors.grey,
               fontSize: 14,
               height: 1.5,
             ),
@@ -156,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: 8.0,
       width: 8.0,
       decoration: BoxDecoration(
-        color: isActive ? AppColors.textPrimary : AppColors.indicatorInactive,
+        color: isActive ? AppColors.white : AppColors.grey.withOpacity(0.3),
         shape: BoxShape.circle,
       ),
     );
