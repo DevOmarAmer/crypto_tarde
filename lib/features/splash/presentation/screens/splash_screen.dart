@@ -34,7 +34,6 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // استخدم الصورة الحقيقية للوجو هنا
             Image.asset(
               AppAssets.logo,
               width: 100,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/widgets/custom_action_tile.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -9,106 +12,54 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
-        title: const Text('Settings', style: TextStyle(color: AppColors.white)),
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.darkBackground,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          AppStrings.settings,
+          style: TextStyle(
+            color: AppColors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.only(top: 16.0),
         children: [
-          _buildSectionHeader('Account'),
-          _buildSettingTile(
-            icon: Icons.person_outline,
-            title: 'Personal Info',
-            onTap: () {},
-          ),
-          _buildSettingTile(
-            icon: Icons.notifications_none,
-            title: 'Notifications',
-            onTap: () {},
-          ),
-          _buildSectionHeader('Preferences'),
-          _buildSettingTile(
-            icon: Icons.language,
-            title: 'Language',
+          CustomActionTile(
+            title: AppStrings.language,
             trailingText: 'English',
+            leadingIcon: Icons.language,
             onTap: () {},
           ),
-          _buildSettingTile(
-            icon: Icons.dark_mode_outlined,
-            title: 'Dark Mode',
-            trailing: Switch(
-              value: true,
-              onChanged: (v) {},
-              activeColor: AppColors.primary,
-            ),
+          CustomActionTile(
+            title: AppStrings.currency,
+            trailingText: 'USD',
+            leadingIcon: Icons.monetization_on_outlined,
             onTap: () {},
           ),
-          _buildSectionHeader('Other'),
-          _buildSettingTile(
-            icon: Icons.privacy_tip_outlined,
-            title: 'Privacy Policy',
+          CustomActionTile(
+            title: AppStrings.appearance,
+            trailingText: 'Use Device Settings',
+            leadingIcon: Icons.dark_mode_outlined,
             onTap: () {},
           ),
-          _buildSettingTile(
-            icon: Icons.help_outline,
-            title: 'Help Center',
+          CustomActionTile(
+            title: AppStrings.preference,
+            trailingText: 'Customize',
+            leadingIcon: Icons.tune,
             onTap: () {},
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 10),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: AppColors.primary,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettingTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    String? trailingText,
-    Widget? trailing,
-  }) {
-    return ListTile(
-      onTap: onTap,
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon, color: AppColors.white, size: 20),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w500),
-      ),
-      trailing: trailing ?? Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (trailingText != null)
-            Text(
-              trailingText,
-              style: const TextStyle(color: AppColors.grey, fontSize: 14),
-            ),
-          const SizedBox(width: 5),
-          const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.grey),
+          CustomActionTile(
+            title: AppStrings.aboutUs,
+            trailingText: 'v1.2.3',
+            leadingIcon: Icons.people_outline,
+            onTap: () {},
+          ),
         ],
       ),
     );
