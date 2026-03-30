@@ -25,9 +25,9 @@ class CryptoTradeApp extends StatelessWidget {
           brightness: Brightness.dark, 
         ),
         useMaterial3: true,
-        scaffoldBackgroundColor: AppColors.background,
+        scaffoldBackgroundColor: AppColors.darkBackground,
         appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.surface,
+          backgroundColor: AppColors.darkSurface,
           elevation: 0,
         ),
       ),

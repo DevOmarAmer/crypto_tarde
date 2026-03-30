@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="47" height="54" fill="none" viewBox="0 0 47 54">
+  <g filter="url(#a)">
+    <path stroke="#5ED5A8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M29.75 22.4v3.7c0 3.12-2.91 5.65-6.5 5.65s-6.5-2.53-6.5-5.65v-3.7c0 3.12 2.91 5.35 6.5 5.35s6.5-2.23 6.5-5.35Z"/>
+    <path stroke="#5ED5A8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M29.75 17.4c0 .91-.25 1.75-.69 2.47-1.07 1.76-3.27 2.88-5.81 2.88-2.54 0-4.74-1.12-5.81-2.88-.44-.72-.69-1.56-.69-2.47 0-1.56.73-2.97 1.9-3.99 1.18-1.03 2.8-1.66 4.6-1.66 1.8 0 3.42.63 4.6 1.65 1.17 1.03 1.9 2.44 1.9 4Z"/>
+    <path stroke="#5ED5A8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M29.75 17.4v5c0 3.12-2.91 5.35-6.5 5.35s-6.5-2.23-6.5-5.35v-5c0-3.12 2.91-5.65 6.5-5.65 1.8 0 3.42.63 4.6 1.65 1.17 1.03 1.9 2.44 1.9 4Z"/>
+  </g>
+  <defs>
+    <filter id="a" width="46.5" height="53.5" x="0" y="0" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+      <feOffset dy="5"/>
+      <feGaussianBlur stdDeviation="8"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix values="0 0 0 0 0.368627 0 0 0 0 0.835294 0 0 0 0 0.658824 0 0 0 0.25 0"/>
+      <feBlend in2="BackgroundImageFix" result="effect1_dropShadow_858_16987"/>
+      <feBlend in="SourceGraphic" in2="effect1_dropShadow_858_16987" result="shape"/>
+    </filter>
+  </defs>
+</svg>
