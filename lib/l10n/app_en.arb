@@ -1,0 +1,16 @@
+{
+  "@@locale": "en",
+  "app_title": "Crypto Trade",
+  "skip": "Skip",
+  "next": "Next",
+  "get_started": "Get Started",
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "forgot_password": "Forgot Password?",
+  "dont_have_account": "Don't have an account?",
+  "already_have_account": "Already have an account?",
+  "settings": "Settings",
+  "profile": "Profile"
+}

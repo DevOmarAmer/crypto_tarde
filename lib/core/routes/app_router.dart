@@ -1,0 +1,47 @@
+import 'package:go_router/go_router.dart';
+
+import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
+
+class AppRouter {
+  static const String splash = '/';
+  static const String onboarding = '/onboarding';
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String profile = '/profile';
+  static const String settings = '/settings';
+
+  static final GoRouter router = GoRouter(
+    initialLocation: splash,
+    routes: [
+      GoRoute(
+        path: splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: register,
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: profile,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+    ],
+  );
+}
