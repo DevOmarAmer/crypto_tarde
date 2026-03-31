@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../home/presentation/widgets/custom_bottom_nav.dart';
 import '../../domain/models/wallet_asset_model.dart';
+
 import '../widgets/wallet_asset_tile.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -66,9 +66,8 @@ class _WalletScreenState extends State<WalletScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      extendBody: true,
-      bottomNavigationBar: const CustomBottomNav(currentIndex: 4), 
       body: SafeArea(
+
         child: Column(
           children: [
             _buildHeaderSection(),

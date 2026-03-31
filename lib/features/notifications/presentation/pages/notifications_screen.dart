@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../domain/models/notification_model.dart';
 import '../widgets/notification_tile.dart';
-import '../../../home/presentation/widgets/custom_bottom_nav.dart';
+
 
 class NotificationsScreen extends StatelessWidget {
   NotificationsScreen({super.key});
@@ -41,9 +41,8 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      extendBody: true,
-      bottomNavigationBar: const CustomBottomNav(currentIndex: 3),
       body: SafeArea(
+
         child: Column(
           children: [
             const CustomAppBar(),

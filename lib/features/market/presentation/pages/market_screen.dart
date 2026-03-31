@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
-import '../../../home/presentation/widgets/custom_bottom_nav.dart';
 import '../../domain/models/market_coin_model.dart';
+
 import '../widgets/market_coin_tile.dart';
 
 class MarketScreen extends StatefulWidget {
@@ -78,9 +78,8 @@ class _MarketScreenState extends State<MarketScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      extendBody: true,
-      bottomNavigationBar: const CustomBottomNav(), 
       body: SafeArea(
+
         child: Column(
           children: [
             const CustomAppBar(), // المكون المُعاد استخدامه

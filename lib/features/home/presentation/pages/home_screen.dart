@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../widgets/home_header.dart';
 import '../widgets/trading_option_card.dart';
 import '../widgets/coin_card.dart';
-import '../widgets/custom_bottom_nav.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,9 +13,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      extendBody: true, // ضرورية لكي يظهر المحتوى أسفل شريط التنقل العائم
-      bottomNavigationBar: const CustomBottomNav(currentIndex: 0),
       body: SingleChildScrollView(
+
         padding: const EdgeInsets.only(bottom: 120.0), // مساحة لشريط التنقل
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
