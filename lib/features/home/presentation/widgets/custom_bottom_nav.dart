@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class CustomBottomNav extends StatelessWidget {
-  const CustomBottomNav({super.key});
+  final int currentIndex;
+
+  const CustomBottomNav({super.key, this.currentIndex = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -24,30 +28,69 @@ class CustomBottomNav extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavItem('assets/images/svg/home.svg', 'Home', true),
-          _buildNavItem('assets/images/svg/market.svg', 'Markets', false),
-          _buildNavItem('assets/images/svg/trades.svg', 'Trades', false),
-          _buildNavItem('assets/images/svg/activity.svg', 'Activity', false),
-          _buildNavItem('assets/images/svg/wallet.svg', 'Wallets', false),
+          _buildNavItem(
+            context,
+            'assets/images/svg/home.svg',
+            'Home',
+            currentIndex == 0,
+            () => context.go(AppRouter.home),
+          ),
+          _buildNavItem(
+            context,
+            'assets/images/svg/shopping-bag.svg',
+            'Markets',
+            currentIndex == 1,
+            () => context.go(AppRouter.market),
+          ),
+          _buildNavItem(
+            context,
+            'assets/images/svg/money-send.svg',
+            'Trades',
+            currentIndex == 2,
+            () {},
+          ),
+          _buildNavItem(
+            context,
+            'assets/images/svg/receipt.svg',
+            'Activity',
+            currentIndex == 3,
+            () {},
+          ),
+          _buildNavItem(
+            context,
+            'assets/images/svg/empty-wallet.svg',
+            'Wallets',
+            currentIndex == 4,
+            () {},
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(String assetPath, String label, bool isActive) {
+  Widget _buildNavItem(
+    BuildContext context,
+    String assetPath,
+    String label,
+    bool isActive,
+    VoidCallback onTap,
+  ) {
     final color = isActive ? AppColors.primary : AppColors.textSecondary;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SvgPicture.asset(
-          assetPath,
-          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-          width: 50,
-          height: 50,
-        ),
-        // const SizedBox(height: 4),
-        Text(label, style: TextStyle(color: color, fontSize: 10)),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(
+            assetPath,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            width: 24,
+            height: 24,
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(color: color, fontSize: 10)),
+        ],
+      ),
     );
   }
 }
