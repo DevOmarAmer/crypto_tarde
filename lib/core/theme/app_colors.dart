@@ -45,4 +45,13 @@ class AppColors {
   static const Color toggleBackground = Color(0xFF212931);
   static const Color toggleActive = Color(0xFF1B232A);
   static const Color inputFillColor = Color(0xFF212931);
+
+  // --- Design System Aliases ---
+  static const Color textPrimary = white;
+  static const Color textSecondary = grey;
+  static const Color textDark = black;
+  static const Color cardWhite = white;
+  static const Color priceGreen = success;
+  static const Color priceRed = error;
 }
+

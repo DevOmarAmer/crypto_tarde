@@ -90,9 +90,10 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: CustomButton(
                   text: _isLogin ? 'Sign in' : 'Sign up',
                   onPressed: () {
-                    context.go(AppRouter.profile);
+                    context.go(AppRouter.home);
                   },
                 ),
+
               ),
               const SizedBox(height: 32),
               const Center(
