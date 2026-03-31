@@ -61,8 +61,9 @@ class CustomBottomNav extends StatelessWidget {
             'assets/images/svg/empty-wallet.svg',
             'Wallets',
             currentIndex == 4,
-            () {},
+            () => context.go(AppRouter.wallet),
           ),
+
         ],
       ),
     );

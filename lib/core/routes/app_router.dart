@@ -8,6 +8,8 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/market/presentation/pages/market_screen.dart';
+import '../../features/wallet/presentation/pages/wallet_screen.dart';
+
 
 
 
@@ -21,6 +23,8 @@ class AppRouter {
   static const String home = '/home';
   static const String notifications = '/notifications';
   static const String market = '/market';
+  static const String wallet = '/wallet';
+
 
 
 
@@ -60,6 +64,11 @@ class AppRouter {
         path: market,
         builder: (context, state) => const MarketScreen(),
       ),
+      GoRoute(
+        path: wallet,
+        builder: (context, state) => const WalletScreen(),
+      ),
+
 
 
 
