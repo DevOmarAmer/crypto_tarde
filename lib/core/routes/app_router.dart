@@ -6,6 +6,8 @@ import '../../features/auth/presentation/screens/auth_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
+import '../../features/notifications/presentation/pages/notifications_screen.dart';
+
 
 
 class AppRouter {
@@ -15,6 +17,8 @@ class AppRouter {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String home = '/home';
+  static const String notifications = '/notifications';
+
 
 
   static final GoRouter router = GoRouter(
@@ -44,6 +48,11 @@ class AppRouter {
         path: home,
         builder: (context, state) => const HomeScreen(),
       ),
+      GoRoute(
+        path: notifications,
+        builder: (context, state) => NotificationsScreen(),
+      ),
+
 
     ],
   );

@@ -53,5 +53,11 @@ class AppColors {
   static const Color cardWhite = white;
   static const Color priceGreen = success;
   static const Color priceRed = error;
+
+  // --- Notification Status Colors ---
+  static const Color statusSuccess = Color(0xFF5ED5A8); // أخضر
+  static const Color statusWarning = Color(0xFFFFC233); // أصفر
+  static const Color statusError = Color(0xFFF6465D); // أحمر
 }
+
 

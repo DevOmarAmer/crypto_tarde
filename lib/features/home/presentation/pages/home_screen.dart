@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+
 import '../widgets/quick_action_item.dart';
 import '../widgets/trading_option_card.dart';
 import '../widgets/coin_card.dart';
@@ -21,7 +23,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeaderSection(),
+            _buildHeaderSection(context),
+
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -72,7 +75,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   // القسم العلوي الداكن
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(
         top: 60.0,
@@ -127,7 +130,7 @@ class HomeScreen extends StatelessWidget {
                         BlendMode.srcIn,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () => context.push(AppRouter.notifications),
                   ),
                 ],
               ),
