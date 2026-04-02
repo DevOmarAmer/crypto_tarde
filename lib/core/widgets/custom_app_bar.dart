@@ -4,11 +4,32 @@ import 'package:go_router/go_router.dart';
 import '../../core/routes/app_router.dart';
 import '../../core/theme/app_colors.dart';
 
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({super.key});
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? title;
+  final bool showBackButton;
+
+  const CustomAppBar({super.key, this.title, this.showBackButton = false});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
+    if (title != null || showBackButton) {
+      return AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: showBackButton 
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+                onPressed: () => context.pop(),
+              )
+            : null,
+        title: title != null ? Text(title!, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)) : null,
+        centerTitle: true,
+      );
+    }
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       child: Row(

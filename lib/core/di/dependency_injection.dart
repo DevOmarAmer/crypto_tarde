@@ -9,6 +9,13 @@ import '../../features/market/domain/repositories/market_repository.dart';
 import '../../features/market/domain/usecases/get_market_coins_usecase.dart';
 import '../../features/market/presentation/bloc/market_cubit.dart';
 
+// Trade Feature Imports
+import '../../features/trade/data/datasources/trade_local_datasource.dart';
+import '../../features/trade/data/datasources/trade_remote_datasource.dart';
+import '../../features/trade/data/repositories/trade_repository_impl.dart';
+import '../../features/trade/domain/repositories/trade_repository.dart';
+import '../../features/trade/presentation/bloc/trade_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
@@ -21,6 +28,7 @@ Future<void> initDependencies() async {
 
   // Features - Blocs/Cubits
   sl.registerFactory(() => MarketCubit(getMarketCoinsUseCase: sl()));
+  sl.registerFactory(() => TradeCubit(repository: sl(), webSocketService: sl()));
 
   // Features - UseCases
   sl.registerLazySingleton(() => GetMarketCoinsUseCase(sl()));
@@ -29,9 +37,18 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<MarketRepository>(
     () => MarketRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<TradeRepository>(
+    () => TradeRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+  );
 
   // Features - Data Sources
   sl.registerLazySingleton(
     () => MarketRemoteDataSource(dioClient: sl()),
+  );
+  sl.registerLazySingleton(
+    () => TradeRemoteDataSource(dioClient: sl()),
+  );
+  sl.registerLazySingleton(
+    () => TradeLocalDataSource(),
   );
 }

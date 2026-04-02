@@ -13,6 +13,7 @@ import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/market/presentation/pages/market_screen.dart';
 import '../../features/wallet/presentation/pages/wallet_screen.dart';
+import '../../features/trade/presentation/pages/trade_screen.dart';
 import '../widgets/main_scaffold.dart';
 
 class AppRouter {
@@ -25,7 +26,8 @@ class AppRouter {
   static const String notifications = '/notifications';
   static const String market = '/market';
   static const String wallet = '/wallet';
-  static const String trades = '/trades'; // Placeholder for trades screen
+  static const String trades = '/trade_screen'; // Full trade screen
+  static const String myTrades = '/my_trades'; // Activity feed
 
   static final GoRouter router = GoRouter(
     initialLocation: splash,
@@ -81,18 +83,30 @@ class AppRouter {
             builder: (context, state) => const WalletScreen(),
           ),
           GoRoute(
-            path: trades,
+            path: myTrades,
             builder: (context, state) => Container(
               color: Colors.black,
               child: const Center(
                 child: Text(
-                  'Trades Page Coming Soon',
+                  'Activity Page Coming Soon',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
           ),
         ],
+      ),
+      GoRoute(
+        path: trades,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          return TradeScreen(
+            coinId: extras?['coinId'] ?? 'bitcoin',
+            symbol: extras?['symbol'] ?? 'BTC',
+            name: extras?['name'] ?? 'Bitcoin',
+            logoUrl: extras?['logoUrl'] ?? '',
+          );
+        },
       ),
     ],
   );
