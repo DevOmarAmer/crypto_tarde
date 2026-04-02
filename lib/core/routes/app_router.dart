@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../di/dependency_injection.dart';
+import '../../features/market/presentation/bloc/market_cubit.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/auth_screen.dart';
@@ -64,7 +67,10 @@ class AppRouter {
           ),
           GoRoute(
             path: market,
-            builder: (context, state) => const MarketScreen(),
+            builder: (context, state) => BlocProvider(
+              create: (_) => sl<MarketCubit>()..fetchMarketCoins(),
+              child: const MarketScreen(),
+            ),
           ),
           GoRoute(
             path: notifications,
