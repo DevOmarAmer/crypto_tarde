@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
-import '../../domain/models/market_coin_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/market_cubit.dart';
 
 import '../widgets/market_coin_tile.dart';
 
@@ -16,82 +17,62 @@ class _MarketScreenState extends State<MarketScreen> {
   int _selectedTabIndex = 1; // الافتراضي 'Spot' كما في التصميم
   final List<String> _tabs = ['Convert', 'Spot', 'Margin', 'Fiat'];
 
-  // بيانات وهمية للتوضيح
-  final List<MarketCoinModel> _coins = [
-    MarketCoinModel(
-      name: 'Bitcoin',
-      symbol: 'BTC',
-      iconAsset: 'assets/images/svg/bitcoin.svg',
-      chartAsset: 'assets/images/png/onboarding_one.png',
-      price: '32,697.05',
-      change: '+0.81%',
-      isPositive: true,
-    ),
-    MarketCoinModel(
-      name: 'Ethereum',
-      symbol: 'ETH',
-      iconAsset: 'assets/images/svg/ethernum.svg',
-      chartAsset: 'assets/images/png/onboarding_one.png',
-      price: '32,697.05',
-      change: '-0.81%',
-      isPositive: false,
-    ),
-    MarketCoinModel(
-      name: 'Cardano',
-      symbol: 'ADA',
-      iconAsset: 'assets/images/svg/cardano.svg',
-      chartAsset: 'assets/images/png/onboarding_one.png',
-      price: '32,697.05',
-      change: '+0.81%',
-      isPositive: true,
-    ),
-    MarketCoinModel(
-      name: 'SHIBA INU',
-      symbol: 'SHIB',
-      iconAsset: 'assets/images/svg/ahiba_inu.svg',
-      chartAsset: 'assets/images/png/onboarding_one.png',
-      price: '32,697.05',
-      change: '-0.81%',
-      isPositive: false,
-    ),
-    MarketCoinModel(
-      name: 'HIFI',
-      symbol: 'MFT',
-      iconAsset: 'assets/images/svg/hifi_finance.svg',
-      chartAsset: 'assets/images/png/onboarding_one.png',
-      price: '32,697.05',
-      change: '-0.81%',
-      isPositive: false,
-    ),
-    MarketCoinModel(
-      name: 'REN',
-      symbol: 'REN',
-      iconAsset: 'assets/images/svg/ren.svg',
-      chartAsset: 'assets/images/png/onboarding_one.png',
-      price: '32,697.05',
-      change: '+0.81%',
-      isPositive: true,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: SafeArea(
-
         child: Column(
           children: [
             const CustomAppBar(), // المكون المُعاد استخدامه
             _buildCustomTabBar(), // شريط التبويبات المخصص
             const SizedBox(height: 16),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(bottom: 120), // مساحة للـ Bottom Nav
-                children: [
-                  ..._coins.map((coin) => MarketCoinTile(coin: coin)),
-                  _buildAddFavoriteButton(),
-                ],
+              child: BlocBuilder<MarketCubit, MarketState>(
+                builder: (context, state) {
+                  if (state is MarketLoading || state is MarketInitial) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: AppColors.primary),
+                    );
+                  } else if (state is MarketError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Failed to load market data',
+                            style: const TextStyle(color: AppColors.textSecondary),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => context.read<MarketCubit>().fetchMarketCoins(),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                            child: const Text('Retry', style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (state is MarketLoaded) {
+                    final coins = state.filteredCoins;
+                    return RefreshIndicator(
+                      onRefresh: () => context.read<MarketCubit>().fetchMarketCoins(),
+                      color: AppColors.primary,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 120), // مساحة للـ Bottom Nav
+                        itemCount: coins.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == coins.length) {
+                            return _buildAddFavoriteButton();
+                          }
+                          return MarketCoinTile(coin: coins[index]);
+                        },
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
               ),
             ),
           ],
