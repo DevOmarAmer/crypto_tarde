@@ -135,7 +135,6 @@ class TradeCubit extends Cubit<TradeState> {
 
       _klineSubscription = webSocketService.getKlineStream(symbol, interval).listen((event) {
         if (state is TradeLoaded && event['k'] != null) {
-          final k = event['k'];
           // Minimal update implementation: append or update last candle
           // For perfection, we'd actually splice the klines list.
         }
