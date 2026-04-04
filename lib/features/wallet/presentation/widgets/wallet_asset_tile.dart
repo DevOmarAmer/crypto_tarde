@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/models/wallet_asset_model.dart';
 
@@ -20,7 +20,13 @@ class WalletAssetTile extends StatelessWidget {
       child: Row(
         children: [
           // أيقونة العملة
-          SvgPicture.asset(asset.iconAsset, width: 40, height: 40),
+          CachedNetworkImage(
+            imageUrl: asset.iconAsset,
+            width: 40,
+            height: 40,
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error, color: AppColors.error),
+          ),
           const SizedBox(width: 16),
           
           // اسم العملة ورمزها

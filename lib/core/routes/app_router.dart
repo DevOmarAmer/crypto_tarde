@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,6 +14,7 @@ import '../../features/notifications/presentation/pages/notifications_screen.dar
 import '../../features/market/presentation/pages/market_screen.dart';
 import '../../features/wallet/presentation/pages/wallet_screen.dart';
 import '../../features/trade/presentation/pages/trade_screen.dart';
+import '../../features/activity/presentation/pages/activity_screen.dart';
 import '../widgets/main_scaffold.dart';
 
 class AppRouter {
@@ -69,7 +70,7 @@ class AppRouter {
           ),
           GoRoute(
             path: market,
-            builder: (context, state) => BlocProvider(
+            builder: (context, state) => BlocProvider<MarketCubit>(
               create: (_) => sl<MarketCubit>()..fetchMarketCoins(),
               child: const MarketScreen(),
             ),
@@ -84,15 +85,7 @@ class AppRouter {
           ),
           GoRoute(
             path: myTrades,
-            builder: (context, state) => Container(
-              color: Colors.black,
-              child: const Center(
-                child: Text(
-                  'Activity Page Coming Soon',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
+            builder: (context, state) => const ActivityScreen(),
           ),
         ],
       ),

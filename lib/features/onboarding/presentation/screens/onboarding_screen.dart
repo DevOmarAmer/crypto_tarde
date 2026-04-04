@@ -1,3 +1,6 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/constants/app_constants.dart';
 import 'package:crypto_tarde/features/onboarding/data/models/onboarding_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -133,9 +136,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             text: _currentIndex == _pages.length - 1
                 ? AppStrings.getStarted
                 : AppStrings.next,
-            onPressed: () {
+            onPressed: () async {
               if (_currentIndex == _pages.length - 1) {
-                context.go(AppRouter.auth);
+                final prefs = sl<SharedPreferences>();
+                await prefs.setBool(AppConstants.onboardingCompletedKey, true);
+                if (mounted) {
+                  context.go(AppRouter.auth);
+                }
               } else {
                 _pageController.nextPage(
                   duration: const Duration(milliseconds: 300),

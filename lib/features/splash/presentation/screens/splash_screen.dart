@@ -1,3 +1,6 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../../core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -16,13 +19,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToOnboarding();
+    _handleNavigation();
   }
 
-  void _navigateToOnboarding() async {
+  void _handleNavigation() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      context.go(AppRouter.onboarding);
+      final prefs = sl<SharedPreferences>();
+      final onboardingCompleted = prefs.getBool(AppConstants.onboardingCompletedKey) ?? false;
+      
+      if (onboardingCompleted) {
+        context.go(AppRouter.auth);
+      } else {
+        context.go(AppRouter.onboarding);
+      }
     }
   }
 

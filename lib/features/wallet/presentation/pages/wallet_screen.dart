@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/local_db/hive_boxes.dart';
 import '../../domain/models/wallet_asset_model.dart';
+import '../../domain/models/portfolio_holding_model.dart';
 
 import '../widgets/wallet_asset_tile.dart';
 
@@ -12,87 +15,72 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  bool _isBalanceVisible = true; // حالة العين (إظهار/إخفاء الرصيد)
-  int _selectedActionIndex = 0;  // تبويب (Deposit) هو الافتراضي
+  bool _isBalanceVisible = true;
+  int _selectedActionIndex = 0;
   final List<String> _actions = ['Deposit', 'Withdraw', 'Transfer'];
-
-  // بيانات وهمية للتوضيح (تتطابق مع التصميم)
-  final List<WalletAssetModel> _assets = [
-    WalletAssetModel(
-      name: 'Bitcoin',
-      symbol: 'BTC',
-      iconAsset: 'assets/images/svg/bitcoin.svg',
-      cryptoBalance: '32,697.05',
-      fiatBalance: '\$468,554.23',
-    ),
-    WalletAssetModel(
-      name: 'Ethereum',
-      symbol: 'ETH',
-      iconAsset: 'assets/images/svg/ethernum.svg',
-      cryptoBalance: '32,697.05',
-      fiatBalance: '\$468,554.23',
-    ),
-    WalletAssetModel(
-      name: 'Cardano',
-      symbol: 'ADA',
-      iconAsset: 'assets/images/svg/cardano.svg',
-      cryptoBalance: '32,697.05',
-      fiatBalance: '\$468,554.23',
-    ),
-    WalletAssetModel(
-      name: 'SHIBA INU',
-      symbol: 'SHIB',
-      iconAsset: 'assets/images/svg/ahiba_inu.svg',
-      cryptoBalance: '32,697.05',
-      fiatBalance: '\$468,554.23',
-    ),
-    WalletAssetModel(
-      name: 'HIFI',
-      symbol: 'MFT',
-      iconAsset: 'assets/images/svg/hifi_finance.svg',
-      cryptoBalance: '32,697.05',
-      fiatBalance: '\$468,554.23',
-    ),
-    WalletAssetModel(
-      name: 'REN',
-      symbol: 'REN',
-      iconAsset: 'assets/images/svg/ren.svg',
-      cryptoBalance: '32,697.05',
-      fiatBalance: '\$468,554.23',
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: SafeArea(
+        child: ValueListenableBuilder(
+          valueListenable: Hive.box(HiveBoxes.userSettings).listenable(keys: ['virtual_cash_balance_usd']),
+          builder: (context, Box settingsBox, _) {
+            final virtualBalance = settingsBox.get('virtual_cash_balance_usd', defaultValue: 10000.0) as double;
+            
+            return ValueListenableBuilder(
+              valueListenable: Hive.box<PortfolioHoldingModel>(HiveBoxes.portfolio).listenable(),
+              builder: (context, Box<PortfolioHoldingModel> portfolioBox, _) {
+                final holdings = portfolioBox.values.toList();
+                
+                // Calculate total invested fiat for demo purposes
+                double totalAssetsValue = 0;
+                for (var holding in holdings) {
+                  totalAssetsValue += holding.quantity * holding.avgBuyPrice;
+                }
+                final totalBalance = virtualBalance + totalAssetsValue;
 
-        child: Column(
-          children: [
-            _buildHeaderSection(),
-            _buildActionButtons(),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.only(bottom: 120), // مساحة لعدم تغطية الـ Bottom Nav
-                itemCount: _assets.length,
-                itemBuilder: (context, index) {
-                  return WalletAssetTile(
-                    asset: _assets[index],
-                    isBalanceVisible: _isBalanceVisible,
-                  );
-                },
-              ),
-            ),
-          ],
+                return Column(
+                  children: [
+                    _buildHeaderSection(totalBalance),
+                    _buildActionButtons(),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: holdings.isEmpty 
+                        ? const Center(child: Text('No assets in wallet', style: TextStyle(color: AppColors.textSecondary)))
+                        : ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 120),
+                            itemCount: holdings.length,
+                            itemBuilder: (context, index) {
+                              final holding = holdings[index];
+                              // Convert to WalletAssetModel for the existing tile
+                              final assetModel = WalletAssetModel(
+                                name: holding.name,
+                                symbol: holding.symbol,
+                                iconAsset: holding.logoUrl, // Note: Tile may need update if it expects SVG
+                                cryptoBalance: holding.quantity.toStringAsFixed(4),
+                                fiatBalance: '\$${(holding.quantity * holding.avgBuyPrice).toStringAsFixed(2)}',
+                              );
+                              return WalletAssetTile(
+                                asset: assetModel,
+                                isBalanceVisible: _isBalanceVisible,
+                              );
+                            },
+                          ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
         ),
       ),
     );
   }
 
   // القسم العلوي الخاص بإجمالي الرصيد
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(double totalBalance) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -128,19 +116,11 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _isBalanceVisible ? '40,059.83' : '********',
+            _isBalanceVisible ? '\$${totalBalance.toStringAsFixed(2)}' : '********',
             style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 32,
               fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _isBalanceVisible ? '\$468,554.23' : '********',
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
             ),
           ),
         ],

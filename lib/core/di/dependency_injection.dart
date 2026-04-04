@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../network/dio_client.dart';
 import '../network/binance_websocket_service.dart';
 import '../local_db/hive_setup.dart';
@@ -19,6 +20,10 @@ import '../../features/trade/presentation/bloc/trade_cubit.dart';
 final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
+  // Initialize Shared Preferences
+  final sharedPrefs = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPrefs);
+
   // Initialize Hive Setup
   await HiveSetup.init();
 
@@ -28,7 +33,9 @@ Future<void> initDependencies() async {
 
   // Features - Blocs/Cubits
   sl.registerFactory(() => MarketCubit(getMarketCoinsUseCase: sl()));
-  sl.registerFactory(() => TradeCubit(repository: sl(), webSocketService: sl()));
+  sl.registerFactory(
+    () => TradeCubit(repository: sl(), webSocketService: sl()),
+  );
 
   // Features - UseCases
   sl.registerLazySingleton(() => GetMarketCoinsUseCase(sl()));
@@ -42,13 +49,7 @@ Future<void> initDependencies() async {
   );
 
   // Features - Data Sources
-  sl.registerLazySingleton(
-    () => MarketRemoteDataSource(dioClient: sl()),
-  );
-  sl.registerLazySingleton(
-    () => TradeRemoteDataSource(dioClient: sl()),
-  );
-  sl.registerLazySingleton(
-    () => TradeLocalDataSource(),
-  );
+  sl.registerLazySingleton(() => MarketRemoteDataSource(dioClient: sl()));
+  sl.registerLazySingleton(() => TradeRemoteDataSource(dioClient: sl()));
+  sl.registerLazySingleton(() => TradeLocalDataSource());
 }
