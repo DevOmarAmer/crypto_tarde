@@ -8,6 +8,7 @@ class CustomTextField extends StatefulWidget {
   final String? trailingActionText;
   final VoidCallback? onTrailingActionTap;
   final TextInputType keyboardType;
+  final TextEditingController? controller;
 
   const CustomTextField({
     super.key,
@@ -17,6 +18,7 @@ class CustomTextField extends StatefulWidget {
     this.trailingActionText,
     this.onTrailingActionTap,
     this.keyboardType = TextInputType.text,
+    this.controller,
   });
 
   @override
@@ -57,6 +59,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         const SizedBox(height: 8),
         TextFormField(
+          controller: widget.controller,
           keyboardType: widget.keyboardType,
           obscureText: widget.isPassword ? _obscureText : false,
           style: const TextStyle(color: AppColors.white),

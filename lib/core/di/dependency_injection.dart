@@ -4,6 +4,14 @@ import '../network/dio_client.dart';
 import '../network/binance_websocket_service.dart';
 import '../local_db/hive_setup.dart';
 
+// Auth Feature Imports
+import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/presentation/bloc/auth_cubit.dart';
+
+// Search Feature Imports
+import '../../features/search/data/repos/search_repo.dart';
+import '../../features/search/logic/search_cubit.dart';
+
 // Market Feature Imports
 import '../../features/market/data/repositories/market_repository_impl.dart';
 import '../../features/market/domain/repositories/market_repository.dart';
@@ -36,6 +44,8 @@ Future<void> initDependencies() async {
   sl.registerFactory(
     () => TradeCubit(repository: sl(), webSocketService: sl()),
   );
+  sl.registerFactory(() => AuthCubit(sl()));
+  sl.registerFactory(() => SearchCubit(sl()));
 
   // Features - UseCases
   sl.registerLazySingleton(() => GetMarketCoinsUseCase(sl()));
@@ -47,6 +57,8 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<TradeRepository>(
     () => TradeRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
+  sl.registerLazySingleton(() => AuthRepository());
+  sl.registerLazySingleton(() => SearchRepo(sl()));
 
   // Features - Data Sources
   sl.registerLazySingleton(() => MarketRemoteDataSource(dioClient: sl()));

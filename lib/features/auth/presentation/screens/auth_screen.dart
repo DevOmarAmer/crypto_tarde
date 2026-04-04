@@ -5,6 +5,9 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/social_login_button.dart';
 import '../../../../core/routes/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/auth_cubit.dart';
+import '../bloc/auth_state.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -16,14 +19,34 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool _isLogin = true;
   bool _isEmailMethod = true;
+  final _identifierController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _identifierController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+        child: BlocConsumer<AuthCubit, AuthState>(
+          listener: (context, state) {
+            if (state is Authenticated) {
+              context.go(AppRouter.home);
+            } else if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
+          builder: (context, state) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -47,6 +70,7 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 32),
               if (_isEmailMethod)
                 CustomTextField(
+                  controller: _identifierController,
                   label: 'Email',
                   hintText: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
@@ -55,6 +79,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 )
               else
                 CustomTextField(
+                  controller: _identifierController,
                   label: 'Mobile Number',
                   hintText: 'Enter your mobile',
                   keyboardType: TextInputType.phone,
@@ -62,7 +87,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   onTrailingActionTap: () => setState(() => _isEmailMethod = true),
                 ),
               const SizedBox(height: 24),
-              const CustomTextField(
+              CustomTextField(
+                controller: _passwordController,
                 label: 'Password',
                 hintText: 'Enter your password',
                 isPassword: true,
@@ -87,13 +113,25 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                child: CustomButton(
-                  text: _isLogin ? 'Sign in' : 'Sign up',
-                  onPressed: () {
-                    context.go(AppRouter.home);
-                  },
-                ),
-
+                child: state is AuthLoading 
+                    ? const Center(child: CircularProgressIndicator())
+                    : CustomButton(
+                        text: _isLogin ? 'Sign in' : 'Sign up',
+                        onPressed: () {
+                          if (_isLogin) {
+                            context.read<AuthCubit>().login(
+                              _identifierController.text,
+                              _passwordController.text,
+                            );
+                          } else {
+                            context.read<AuthCubit>().register(
+                              email: _isEmailMethod ? _identifierController.text : '',
+                              phone: !_isEmailMethod ? _identifierController.text : '',
+                              password: _passwordController.text,
+                            );
+                          }
+                        },
+                      ),
               ),
               const SizedBox(height: 32),
               const Center(
@@ -140,6 +178,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
             ],
           ),
+            );
+          },
         ),
       ),
     );

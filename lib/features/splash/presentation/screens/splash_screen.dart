@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/routes/app_router.dart';
+import '../../../../features/auth/domain/repositories/auth_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -29,7 +30,14 @@ class _SplashScreenState extends State<SplashScreen> {
       final onboardingCompleted = prefs.getBool(AppConstants.onboardingCompletedKey) ?? false;
       
       if (onboardingCompleted) {
-        context.go(AppRouter.auth);
+        final isLoggedIn = await sl<AuthRepository>().isLoggedIn();
+        if (mounted) {
+          if (isLoggedIn) {
+            context.go(AppRouter.home);
+          } else {
+            context.go(AppRouter.auth);
+          }
+        }
       } else {
         context.go(AppRouter.onboarding);
       }

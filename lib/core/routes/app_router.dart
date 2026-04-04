@@ -4,7 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../di/dependency_injection.dart';
 import '../../features/market/presentation/bloc/market_cubit.dart';
+import '../../features/auth/presentation/bloc/auth_cubit.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
+import '../../features/search/presentation/screens/search_screen.dart';
+import '../../features/search/logic/search_cubit.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/auth_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -24,6 +27,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String home = '/home';
+  static const String search = '/search';
   static const String notifications = '/notifications';
   static const String market = '/market';
   static const String wallet = '/wallet';
@@ -44,15 +48,28 @@ class AppRouter {
       ),
       GoRoute(
         path: auth,
-        builder: (context, state) => const AuthScreen(),
+        builder: (context, state) => BlocProvider<AuthCubit>(
+          create: (_) => sl<AuthCubit>(),
+          child: const AuthScreen(),
+        ),
       ),
       GoRoute(
         path: profile,
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) => BlocProvider<AuthCubit>(
+          create: (_) => sl<AuthCubit>()..checkAuthStatus(),
+          child: const ProfileScreen(),
+        ),
       ),
       GoRoute(
         path: settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: search,
+        builder: (context, state) => BlocProvider<SearchCubit>(
+          create: (_) => sl<SearchCubit>()..loadSearchHistory(),
+          child: const SearchScreen(),
+        ),
       ),
 
       // Routes with persistent bottom navigation bar

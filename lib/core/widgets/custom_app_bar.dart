@@ -19,25 +19,39 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       return AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: showBackButton 
+        leading: showBackButton
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: AppColors.textPrimary,
+                ),
                 onPressed: () => context.pop(),
               )
             : null,
-        title: title != null ? Text(title!, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)) : null,
+        title: title != null
+            ? Text(
+                title!,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : null,
         centerTitle: true,
       );
     }
-    
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 32.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const CircleAvatar(
-            radius: 20,
-            backgroundImage: AssetImage('assets/images/png/user.png'),
+          GestureDetector(
+            onTap: () => context.push(AppRouter.profile),
+            child: const CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage('assets/images/png/user.png'),
+            ),
           ),
           Row(
             children: [
@@ -51,19 +65,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   width: 44,
                   height: 44,
                 ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: SvgPicture.asset(
-                  'assets/images/svg/scan.svg',
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.primary,
-                    BlendMode.srcIn,
-                  ),
-                  width: 24,
-                  height: 24,
-                ),
-                onPressed: () {},
+                onPressed: () => context.push(AppRouter.search),
               ),
               IconButton(
                 icon: SvgPicture.asset(
@@ -76,6 +78,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   height: 44,
                 ),
                 onPressed: () => context.push(AppRouter.notifications),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  color: AppColors.primary,
+                  size: 28,
+                ),
+                onPressed: () => context.push(AppRouter.settings),
               ),
             ],
           ),

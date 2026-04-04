@@ -5,7 +5,6 @@ import '../../../../core/widgets/custom_app_bar.dart';
 import '../../domain/models/notification_model.dart';
 import '../widgets/notification_tile.dart';
 
-
 class NotificationsScreen extends StatelessWidget {
   NotificationsScreen({super.key});
 
@@ -42,14 +41,16 @@ class NotificationsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: SafeArea(
-
         child: Column(
           children: [
-            const CustomAppBar(),
+            const CustomAppBar(showBackButton: true),
             _buildSectionHeader(),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 8.0,
+                ),
                 itemCount: _notifications.length,
                 itemBuilder: (context, index) {
                   return NotificationTile(notification: _notifications[index]);
