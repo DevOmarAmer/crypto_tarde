@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/network/exceptions.dart';
 import '../../domain/entities/coin_entity.dart';
 import '../../domain/usecases/get_market_coins_usecase.dart';
 
@@ -77,6 +79,24 @@ class MarketError extends MarketState {
   List<Object?> get props => [message];
 }
 
+/// Emitted when the API returns HTTP 429. Includes a countdown (in seconds)
+/// so the UI can show how long to wait before the cubit auto-retries.
+class MarketRateLimited extends MarketState {
+  /// Seconds remaining before the next automatic retry.
+  final int retryAfterSeconds;
+
+  /// Previously loaded data (if any) so the screen doesn't go blank.
+  final List<CoinEntity>? staleCoins;
+
+  const MarketRateLimited({
+    required this.retryAfterSeconds,
+    this.staleCoins,
+  });
+
+  @override
+  List<Object?> get props => [retryAfterSeconds, staleCoins];
+}
+
 // ---------------------------------------------------------------------------
 // Cubit
 // ---------------------------------------------------------------------------
@@ -88,17 +108,76 @@ class MarketCubit extends Cubit<MarketState> {
 
   MarketCubit({required this.getMarketCoinsUseCase}) : super(MarketInitial());
 
+  // ── Rate-limit backoff bookkeeping ────────────────────────────────────────
+  static const List<int> _kRetryDelays = [30, 60, 90]; // seconds
+  int _retryCount = 0;
+  Timer? _retryTimer;
+  Timer? _countdownTimer;
+  int _countdownSeconds = 0;
+  List<CoinEntity>? _staleCoins; // last good data shown during wait
+
+  @override
+  Future<void> close() {
+    _retryTimer?.cancel();
+    _countdownTimer?.cancel();
+    return super.close();
+  }
+
+  // ── Internal helpers ───────────────────────────────────────────────────────
+
+  void _startRateLimitCountdown(int delaySeconds) {
+    _retryTimer?.cancel();
+    _countdownTimer?.cancel();
+
+    _countdownSeconds = delaySeconds;
+    emit(MarketRateLimited(
+      retryAfterSeconds: _countdownSeconds,
+      staleCoins: _staleCoins,
+    ));
+
+    // Tick every second to update the countdown.
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      _countdownSeconds--;
+      if (isClosed) {
+        t.cancel();
+        return;
+      }
+      emit(MarketRateLimited(
+        retryAfterSeconds: _countdownSeconds,
+        staleCoins: _staleCoins,
+      ));
+      if (_countdownSeconds <= 0) t.cancel();
+    });
+
+    // Auto-retry after the delay.
+    _retryTimer = Timer(Duration(seconds: delaySeconds), () {
+      if (!isClosed) fetchMarketCoins();
+    });
+  }
+
+  // ── Public API ─────────────────────────────────────────────────────────────
+
   /// Initial / refresh fetch – always resets to page 1.
   Future<void> fetchMarketCoins() async {
+    _retryTimer?.cancel();
+    _countdownTimer?.cancel();
     try {
       emit(MarketLoading());
       final coins = await getMarketCoinsUseCase(page: 1, perPage: _kPerPage);
+      _retryCount = 0; // reset on success
+      _staleCoins = coins;
       emit(MarketLoaded(
         coins: coins,
         filteredCoins: coins,
         hasMore: coins.length >= _kPerPage,
         currentPage: 1,
       ));
+    } on RateLimitException {
+      final delay = _retryCount < _kRetryDelays.length
+          ? _kRetryDelays[_retryCount]
+          : _kRetryDelays.last;
+      _retryCount++;
+      _startRateLimitCountdown(delay);
     } catch (e) {
       emit(MarketError(e.toString()));
     }
@@ -121,6 +200,7 @@ class MarketCubit extends Cubit<MarketState> {
         perPage: _kPerPage,
       );
       final allCoins = [...current.coins, ...newCoins];
+      _staleCoins = allCoins;
       emit(current.copyWith(
         coins: allCoins,
         filteredCoins: allCoins,
@@ -128,6 +208,9 @@ class MarketCubit extends Cubit<MarketState> {
         hasMore: newCoins.length >= _kPerPage,
         currentPage: nextPage,
       ));
+    } on RateLimitException {
+      // Stop pagination silently; keep existing data visible.
+      emit(current.copyWith(isLoadingMore: false, hasMore: false));
     } catch (_) {
       // Silently stop pagination on error; user can scroll up to retry.
       emit(current.copyWith(isLoadingMore: false, hasMore: false));

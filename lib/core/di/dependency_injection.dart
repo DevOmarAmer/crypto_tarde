@@ -20,6 +20,7 @@ import '../../features/market/data/repositories/market_repository_impl.dart';
 import '../../features/market/domain/repositories/market_repository.dart';
 import '../../features/market/domain/usecases/get_market_coins_usecase.dart';
 import '../../features/market/presentation/bloc/market_cubit.dart';
+import '../../features/market/presentation/bloc/trending_cubit.dart';
 
 // Trade Feature Imports
 import '../../features/trade/data/datasources/trade_local_datasource.dart';
@@ -44,6 +45,7 @@ Future<void> initDependencies() async {
 
   // Features - Blocs/Cubits
   sl.registerFactory(() => MarketCubit(getMarketCoinsUseCase: sl()));
+  sl.registerFactory(() => TrendingCubit(sl()));
   sl.registerFactory(
     () => TradeCubit(repository: sl(), webSocketService: sl()),
   );
