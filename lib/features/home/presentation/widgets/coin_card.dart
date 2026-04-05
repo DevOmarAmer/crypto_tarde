@@ -9,6 +9,7 @@ class CoinCard extends StatelessWidget {
   final bool isPositive;
   final String coinIconAsset; // SVG path
   final String chartImageAsset; // PNG/Image path
+  final VoidCallback? onTap;
 
   const CoinCard({
     super.key,
@@ -18,16 +19,19 @@ class CoinCard extends StatelessWidget {
     required this.isPositive,
     required this.coinIconAsset,
     required this.chartImageAsset,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final changeColor = isPositive ? AppColors.priceGreen : AppColors.priceRed;
 
-    return Container(
-      width: 150,
-      margin: const EdgeInsets.only(right: 16.0),
-      padding: const EdgeInsets.all(16.0),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 150,
+        margin: const EdgeInsets.only(right: 16.0),
+        padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.cardWhite,
         borderRadius: BorderRadius.circular(16.0),
@@ -73,6 +77,7 @@ class CoinCard extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ],
+      ),
       ),
     );
   }

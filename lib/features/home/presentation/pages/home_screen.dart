@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/routes/app_router.dart';
 
 import '../widgets/home_header.dart';
 import '../widgets/trading_option_card.dart';
 import '../widgets/coin_card.dart';
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       body: SingleChildScrollView(
-
         padding: const EdgeInsets.only(bottom: 120.0), // مساحة لشريط التنقل
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,13 +29,13 @@ class HomeScreen extends StatelessWidget {
                     title: 'P2P Trading',
                     subtitle: 'Bank Transfer, Paypal Revolut...',
                     imageAsset: 'assets/images/png/rocket.png',
-                    onTap: () {},
+                    onTap: () => context.push(AppRouter.market),
                   ),
                   TradingOptionCard(
                     title: 'Credit/Debit Card',
                     subtitle: 'Visa, Mastercard',
                     imageAsset: 'assets/images/png/credit.png',
-                    onTap: () {},
+                    onTap: () => context.push(AppRouter.wallet),
                   ),
 
                   const SizedBox(height: 24),
@@ -48,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildCoinsList(), // Recent Coins
+                  _buildCoinsList(context), // Recent Coins
                   const SizedBox(height: 24),
                   const Text(
                     'Top Coins',
@@ -59,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildCoinsList(), // Top Coins
+                  _buildCoinsList(context), // Top Coins
                 ],
               ),
             ),
@@ -70,13 +70,13 @@ class HomeScreen extends StatelessWidget {
   }
 
   // قائمة العملات الأفقية (تم وضع بيانات وهمية للتوضيح)
-  Widget _buildCoinsList() {
+  Widget _buildCoinsList(BuildContext context) {
     return SizedBox(
       height: 140, // ارتفاع ثابت للبطاقة
       child: ListView(
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none, // لمنع قص الـ Shadow إذا تم إضافته لاحقاً
-        children: const [
+        children: [
           CoinCard(
             price: '40,059.83',
             pair: 'BTC/BUSD',
@@ -85,6 +85,10 @@ class HomeScreen extends StatelessWidget {
             coinIconAsset: 'assets/images/svg/bitcoin.svg',
             chartImageAsset:
                 'assets/images/png/onboarding_one.png', // Placeholder for chart
+            onTap: () => context.push(
+              AppRouter.trades,
+              extra: {'coinId': 'bitcoin', 'symbol': 'BTC', 'name': 'Bitcoin'},
+            ),
           ),
           CoinCard(
             price: '2,059.83',
@@ -94,6 +98,10 @@ class HomeScreen extends StatelessWidget {
             coinIconAsset: 'assets/images/svg/solana.svg',
             chartImageAsset:
                 'assets/images/png/onboarding_two.png', // Placeholder for chart
+            onTap: () => context.push(
+              AppRouter.trades,
+              extra: {'coinId': 'solana', 'symbol': 'SOL', 'name': 'Solana'},
+            ),
           ),
           CoinCard(
             price: '40,059.83',
@@ -103,6 +111,14 @@ class HomeScreen extends StatelessWidget {
             coinIconAsset: 'assets/images/svg/ethernum.svg',
             chartImageAsset:
                 'assets/images/png/onboarding_three.png', // Placeholder for chart
+            onTap: () => context.push(
+              AppRouter.trades,
+              extra: {
+                'coinId': 'ethereum',
+                'symbol': 'ETH',
+                'name': 'Ethereum',
+              },
+            ),
           ),
         ],
       ),

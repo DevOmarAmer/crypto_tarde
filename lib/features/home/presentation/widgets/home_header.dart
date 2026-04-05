@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/routes/app_router.dart';
 import 'quick_action_item.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -33,38 +35,41 @@ class HomeHeader extends StatelessWidget {
                 childAspectRatio: 0.8,
                 mainAxisSpacing: 8.0,
                 crossAxisSpacing: 16.0,
-                children: const [
+                children: [
                   QuickActionItem(
                     title: 'Deposit',
                     iconAsset: 'assets/images/svg/deposit.svg',
+                    onTap: () => context.push(AppRouter.wallet),
                   ),
                   QuickActionItem(
                     title: 'Referral',
                     iconAsset: 'assets/images/svg/referral.svg',
+                    onTap: () => context.push(AppRouter.profile),
                   ),
-                  QuickActionItem(
+                  const QuickActionItem(
                     title: 'Grid Trading',
                     iconAsset: 'assets/images/svg/grid_trading.svg',
                   ),
-                  QuickActionItem(
+                  const QuickActionItem(
                     title: 'Margin',
                     iconAsset: 'assets/images/svg/margin.svg',
                   ),
-                  QuickActionItem(
+                  const QuickActionItem(
                     title: 'Launchpad',
                     iconAsset: 'assets/images/svg/launchpad.svg',
                   ),
-                  QuickActionItem(
+                  const QuickActionItem(
                     title: 'Savings',
                     iconAsset: 'assets/images/svg/savings.svg',
                   ),
-                  QuickActionItem(
+                  const QuickActionItem(
                     title: 'Liquid Swap',
                     iconAsset: 'assets/images/svg/liquid_swap.svg',
                   ),
                   QuickActionItem(
                     title: 'More',
                     iconAsset: 'assets/images/svg/more.svg',
+                    onTap: () => context.push(AppRouter.settings),
                   ),
                 ],
               ),

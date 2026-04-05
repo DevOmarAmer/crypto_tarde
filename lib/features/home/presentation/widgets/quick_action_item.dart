@@ -6,17 +6,21 @@ import '../../../../core/theme/app_colors.dart';
 class QuickActionItem extends StatelessWidget {
   final String title;
   final String iconAsset; // مسار الأيقونة SVG
+  final VoidCallback? onTap;
 
   const QuickActionItem({
     super.key,
     required this.title,
     required this.iconAsset,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
       children: [
         SvgPicture.asset(
           iconAsset,
@@ -34,6 +38,7 @@ class QuickActionItem extends StatelessWidget {
           style: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
         ),
       ],
+    ),
     );
   }
 }
