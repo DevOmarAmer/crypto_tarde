@@ -45,15 +45,25 @@ class CustomBottomNav extends StatelessWidget {
           _buildNavItem(
             context,
             'assets/images/svg/receipt.svg',
-            'Activity',
+            'Favorites',
             currentIndex == 2,
+            () => context.go(AppRouter.favorites),
+            icon: currentIndex == 2
+                ? Icons.star_rounded
+                : Icons.star_outline_rounded,
+          ),
+          _buildNavItem(
+            context,
+            'assets/images/svg/receipt.svg',
+            'Activity',
+            currentIndex == 3,
             () => context.go(AppRouter.myTrades),
           ),
           _buildNavItem(
             context,
             'assets/images/svg/empty-wallet.svg',
             'Wallets',
-            currentIndex == 3,
+            currentIndex == 4,
             () => context.go(AppRouter.wallet),
           ),
 
@@ -67,20 +77,24 @@ class CustomBottomNav extends StatelessWidget {
     String assetPath,
     String label,
     bool isActive,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    IconData? icon,
+  }) {
     final color = isActive ? AppColors.primary : AppColors.textSecondary;
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset(
-            assetPath,
-            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-            width: 24,
-            height: 24,
-          ),
+          if (icon != null)
+            Icon(icon, color: color, size: 24)
+          else
+            SvgPicture.asset(
+              assetPath,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+              width: 24,
+              height: 24,
+            ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(color: color, fontSize: 10)),
         ],

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/coin_entity.dart';
+import '../../../favorites/presentation/bloc/favorites_cubit.dart';
 
 class MarketCoinTile extends StatelessWidget {
   final CoinEntity coin;
@@ -15,7 +17,8 @@ class MarketCoinTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final changeColor = coin.isPositive ? AppColors.priceGreen : AppColors.priceRed;
+    final changeColor =
+        coin.isPositive ? AppColors.priceGreen : AppColors.priceRed;
 
     final priceFormat = NumberFormat.currency(
       symbol: '\$',
@@ -60,7 +63,7 @@ class MarketCoinTile extends StatelessWidget {
               errorWidget: (context, url, error) =>
                   const Icon(Icons.error, color: AppColors.error),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
 
             // ── Name and Symbol ───────────────────────────────────────────
             Expanded(
@@ -80,7 +83,7 @@ class MarketCoinTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    coin.symbol,
+                    coin.symbol.toUpperCase(),
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
@@ -125,6 +128,38 @@ class MarketCoinTile extends StatelessWidget {
                 ],
               ),
             ),
+
+            const SizedBox(width: 8),
+
+            // ── Favorite Star ─────────────────────────────────────────────
+            BlocBuilder<FavoritesCubit, FavoritesState>(
+              builder: (context, favState) {
+                final isFav = favState.isFavorited(coin.id);
+                return GestureDetector(
+                  onTap: () =>
+                      context.read<FavoritesCubit>().toggleFavorite(coin.id),
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => ScaleTransition(
+                        scale: animation,
+                        child: child,
+                      ),
+                      child: Icon(
+                        isFav ? Icons.star_rounded : Icons.star_outline_rounded,
+                        key: ValueKey(isFav),
+                        color: isFav
+                            ? const Color(0xFFF0B90B) // Binance gold
+                            : AppColors.textSecondary,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -136,7 +171,6 @@ class MarketCoinTile extends StatelessWidget {
 
     final minY = coin.sparkline.reduce((a, b) => a < b ? a : b);
     final maxY = coin.sparkline.reduce((a, b) => a > b ? a : b);
-    // Guard against flat line (min == max) which causes an fl_chart assertion.
     final range = maxY - minY;
     final safeMin = range == 0 ? minY - 1 : minY;
     final safeMax = range == 0 ? maxY + 1 : maxY;

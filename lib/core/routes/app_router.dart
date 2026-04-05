@@ -19,6 +19,8 @@ import '../../features/wallet/presentation/pages/wallet_screen.dart';
 import '../../features/trade/presentation/pages/trade_screen.dart';
 import '../../features/activity/presentation/pages/activity_screen.dart';
 import '../widgets/main_scaffold.dart';
+import '../../features/favorites/presentation/pages/favorites_screen.dart';
+import '../../features/favorites/presentation/bloc/favorites_cubit.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -33,6 +35,7 @@ class AppRouter {
   static const String wallet = '/wallet';
   static const String trades = '/trade_screen'; // Full trade screen
   static const String myTrades = '/my_trades'; // Activity feed
+  static const String favorites = '/favorites';
 
   static final GoRouter router = GoRouter(
     initialLocation: splash,
@@ -75,7 +78,10 @@ class AppRouter {
       // Routes with persistent bottom navigation bar
       ShellRoute(
         builder: (context, state, child) {
-          return MainScaffold(location: state.matchedLocation, child: child);
+          return BlocProvider<FavoritesCubit>(
+            create: (_) => sl<FavoritesCubit>(),
+            child: MainScaffold(location: state.matchedLocation, child: child),
+          );
         },
         routes: [
           GoRoute(path: home, builder: (context, state) => const HomeScreen()),
@@ -97,6 +103,13 @@ class AppRouter {
           GoRoute(
             path: myTrades,
             builder: (context, state) => const ActivityScreen(),
+          ),
+          GoRoute(
+            path: favorites,
+            builder: (context, state) => BlocProvider<MarketCubit>(
+              create: (_) => sl<MarketCubit>()..fetchMarketCoins(),
+              child: const FavoritesScreen(),
+            ),
           ),
         ],
       ),

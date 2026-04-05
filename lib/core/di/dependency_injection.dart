@@ -12,6 +12,9 @@ import '../../features/auth/presentation/bloc/auth_cubit.dart';
 import '../../features/search/data/repos/search_repo.dart';
 import '../../features/search/logic/search_cubit.dart';
 
+// Favorites Feature Imports
+import '../../features/favorites/presentation/bloc/favorites_cubit.dart';
+
 // Market Feature Imports
 import '../../features/market/data/repositories/market_repository_impl.dart';
 import '../../features/market/domain/repositories/market_repository.dart';
@@ -46,6 +49,7 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory(() => AuthCubit(sl()));
   sl.registerFactory(() => SearchCubit(sl()));
+  sl.registerLazySingleton(() => FavoritesCubit(sl()));
 
   // Features - UseCases
   sl.registerLazySingleton(() => GetMarketCoinsUseCase(sl()));
