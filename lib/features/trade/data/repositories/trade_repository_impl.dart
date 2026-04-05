@@ -65,4 +65,10 @@ class TradeRepositoryImpl implements TradeRepository {
   Future<double> getVirtualBalance() {
     return localDataSource.getVirtualBalance();
   }
+
+  @override
+  Future<double> getOwnedQuantity(String coinId) async {
+    final holding = await localDataSource.getPortfolioHolding(coinId);
+    return holding?.quantity ?? 0.0;
+  }
 }

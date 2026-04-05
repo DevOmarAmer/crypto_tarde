@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../bloc/trade_cubit.dart';
+import '../widgets/candlestick_chart.dart';
 
 class TradeScreen extends StatelessWidget {
   final String coinId;
@@ -22,7 +23,7 @@ class TradeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<TradeCubit>()..initTrade('${symbol}USDT'),
+      create: (context) => sl<TradeCubit>()..initTrade(coinId, '${symbol}USDT'),
       child: Scaffold(
         backgroundColor: AppColors.darkBackground,
         body: SafeArea(
@@ -86,12 +87,10 @@ class TradeScreen extends StatelessWidget {
         
         // Chart Area
         Container(
-          height: 250,
+          height: 280,
           color: AppColors.darkSurface,
-          child: const Center(
-            child: Text('Candlestick Chart Placeholder', style: TextStyle(color: AppColors.textSecondary)),
-            // Here we would implement candlesticks package widget
-          ),
+          padding: const EdgeInsets.only(top: 8, bottom: 4),
+          child: CandlestickChart(klines: state.klines),
         ),
 
         // Order Book Area
@@ -201,43 +200,44 @@ class TradeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.priceGreen,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              if (state.ownedQuantity <= 0)
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.priceGreen,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      context.read<TradeCubit>().executeBuy(
+                        coinId: coinId,
+                        symbol: symbol,
+                        name: name,
+                        logoUrl: logoUrl,
+                        quantity: 1.0, // Hardcoded for demo/simplicity
+                      );
+                    },
+                    child: const Text('Buy', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
-                  onPressed: () {
-                    context.read<TradeCubit>().executeBuy(
-                      coinId: coinId,
-                      symbol: symbol,
-                      name: name,
-                      logoUrl: logoUrl,
-                      quantity: 1.0, // Hardcoded for demo/simplicity
-                    );
-                  },
-                  child: const Text('Buy', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.priceRed,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                )
+              else
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.priceRed,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      context.read<TradeCubit>().executeSell(
+                        coinId: coinId,
+                        symbol: symbol,
+                        quantity: 1.0, // Hardcoded for demo/simplicity
+                      );
+                    },
+                    child: const Text('Sell', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
-                  onPressed: () {
-                    context.read<TradeCubit>().executeSell(
-                      coinId: coinId,
-                      symbol: symbol,
-                      quantity: 1.0, // Hardcoded for demo/simplicity
-                    );
-                  },
-                  child: const Text('Sell', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-              ),
             ],
           ),
         ],

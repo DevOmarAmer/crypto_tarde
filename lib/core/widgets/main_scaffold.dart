@@ -28,9 +28,8 @@ class MainScaffold extends StatelessWidget {
   int _getCurrentIndex(String location) {
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/market')) return 1;
-    if (location.startsWith('/trade_screen') || location.startsWith('/trades')) return 2;
-    if (location.startsWith('/my_trades')) return 3;
-    if (location.startsWith('/wallet')) return 4;
+    if (location.startsWith('/my_trades')) return 2;
+    if (location.startsWith('/wallet')) return 3;
     return 0;
   }
 }

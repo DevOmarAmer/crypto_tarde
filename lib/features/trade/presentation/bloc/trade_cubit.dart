@@ -21,6 +21,7 @@ class TradeLoaded extends TradeState {
   final OrderBookEntity orderBook;
   final double currentPrice;
   final double virtualBalance;
+  final double ownedQuantity;
   final String selectedInterval;
 
   TradeLoaded({
@@ -28,6 +29,7 @@ class TradeLoaded extends TradeState {
     required this.orderBook,
     required this.currentPrice,
     required this.virtualBalance,
+    required this.ownedQuantity,
     required this.selectedInterval,
   });
 
@@ -37,6 +39,7 @@ class TradeLoaded extends TradeState {
         orderBook,
         currentPrice,
         virtualBalance,
+        ownedQuantity,
         selectedInterval,
       ];
 
@@ -45,6 +48,7 @@ class TradeLoaded extends TradeState {
     OrderBookEntity? orderBook,
     double? currentPrice,
     double? virtualBalance,
+    double? ownedQuantity,
     String? selectedInterval,
   }) {
     return TradeLoaded(
@@ -52,6 +56,7 @@ class TradeLoaded extends TradeState {
       orderBook: orderBook ?? this.orderBook,
       currentPrice: currentPrice ?? this.currentPrice,
       virtualBalance: virtualBalance ?? this.virtualBalance,
+      ownedQuantity: ownedQuantity ?? this.ownedQuantity,
       selectedInterval: selectedInterval ?? this.selectedInterval,
     );
   }
@@ -76,13 +81,15 @@ class TradeCubit extends Cubit<TradeState> {
   StreamSubscription? _klineSubscription;
 
   String _currentSymbol = '';
+  String _currentCoinId = '';
 
   TradeCubit({
     required this.repository,
     required this.webSocketService,
   }) : super(TradeInitial());
 
-  Future<void> initTrade(String symbol, {String interval = '1m'}) async {
+  Future<void> initTrade(String coinId, String symbol, {String interval = '1m'}) async {
+    _currentCoinId = coinId;
     _currentSymbol = symbol;
     emit(TradeLoading());
 
@@ -90,6 +97,7 @@ class TradeCubit extends Cubit<TradeState> {
       final klines = await repository.getKlines(symbol, interval);
       final orderBook = await repository.getOrderBook(symbol);
       final balance = await repository.getVirtualBalance();
+      final owned = await repository.getOwnedQuantity(coinId);
 
       final currentPrice = klines.isNotEmpty ? klines.last.close : 0.0;
 
@@ -98,6 +106,7 @@ class TradeCubit extends Cubit<TradeState> {
         orderBook: orderBook,
         currentPrice: currentPrice,
         virtualBalance: balance,
+        ownedQuantity: owned,
         selectedInterval: interval,
       ));
 
@@ -143,8 +152,8 @@ class TradeCubit extends Cubit<TradeState> {
   }
 
   void changeInterval(String interval) {
-    if (_currentSymbol.isNotEmpty) {
-      initTrade(_currentSymbol, interval: interval);
+    if (_currentSymbol.isNotEmpty && _currentCoinId.isNotEmpty) {
+      initTrade(_currentCoinId, _currentSymbol, interval: interval);
     }
   }
 
@@ -173,11 +182,13 @@ class TradeCubit extends Cubit<TradeState> {
       );
       
       final newBalance = await repository.getVirtualBalance();
+      final newOwned = await repository.getOwnedQuantity(coinId);
       emit(TradeExecutionSuccess('Bought $quantity $symbol successfully!'));
-      emit(currentState.copyWith(virtualBalance: newBalance));
+      emit(currentState.copyWith(virtualBalance: newBalance, ownedQuantity: newOwned));
     } catch (e) {
       final s = state;
-      emit(TradeExecutionError(e.toString()));
+      final msg = e.toString().replaceAll('Exception: ', '');
+      emit(TradeExecutionError(msg));
       emit(s);
     }
   }
@@ -203,11 +214,13 @@ class TradeCubit extends Cubit<TradeState> {
       );
       
       final newBalance = await repository.getVirtualBalance();
+      final newOwned = await repository.getOwnedQuantity(coinId);
       emit(TradeExecutionSuccess('Sold $quantity $symbol successfully!'));
-      emit(currentState.copyWith(virtualBalance: newBalance));
+      emit(currentState.copyWith(virtualBalance: newBalance, ownedQuantity: newOwned));
     } catch (e) {
       final s = state;
-      emit(TradeExecutionError(e.toString()));
+      final msg = e.toString().replaceAll('Exception: ', '');
+      emit(TradeExecutionError(msg));
       emit(s);
     }
   }

@@ -38,10 +38,7 @@ class AppRouter {
     initialLocation: splash,
     routes: [
       // Routes without bottom navigation
-      GoRoute(
-        path: splash,
-        builder: (context, state) => const SplashScreen(),
-      ),
+      GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
       GoRoute(
         path: onboarding,
         builder: (context, state) => const OnboardingScreen(),
@@ -62,7 +59,10 @@ class AppRouter {
       ),
       GoRoute(
         path: settings,
-        builder: (context, state) => const SettingsScreen(),
+        builder: (context, state) => BlocProvider<AuthCubit>(
+          create: (_) => sl<AuthCubit>(),
+          child: const SettingsScreen(),
+        ),
       ),
       GoRoute(
         path: search,
@@ -75,16 +75,10 @@ class AppRouter {
       // Routes with persistent bottom navigation bar
       ShellRoute(
         builder: (context, state, child) {
-          return MainScaffold(
-            location: state.matchedLocation,
-            child: child,
-          );
+          return MainScaffold(location: state.matchedLocation, child: child);
         },
         routes: [
-          GoRoute(
-            path: home,
-            builder: (context, state) => const HomeScreen(),
-          ),
+          GoRoute(path: home, builder: (context, state) => const HomeScreen()),
           GoRoute(
             path: market,
             builder: (context, state) => BlocProvider<MarketCubit>(
@@ -109,12 +103,13 @@ class AppRouter {
       GoRoute(
         path: trades,
         builder: (context, state) {
-          final extras = state.extra as Map<String, dynamic>?;
+          final extras = state.extra as Map?;
+          final symbol = (extras?['symbol'] as String?)?.toUpperCase() ?? 'BTC';
           return TradeScreen(
-            coinId: extras?['coinId'] ?? 'bitcoin',
-            symbol: extras?['symbol'] ?? 'BTC',
-            name: extras?['name'] ?? 'Bitcoin',
-            logoUrl: extras?['logoUrl'] ?? '',
+            coinId: extras?['coinId'] as String? ?? 'bitcoin',
+            symbol: symbol,
+            name: extras?['name'] as String? ?? 'Bitcoin',
+            logoUrl: extras?['logoUrl'] as String? ?? '',
           );
         },
       ),

@@ -44,31 +44,16 @@ class CustomBottomNav extends StatelessWidget {
           ),
           _buildNavItem(
             context,
-            'assets/images/svg/money-send.svg',
-            'Trades',
-            currentIndex == 2,
-            () => context.push(
-              AppRouter.trades,
-              extra: {
-                'coinId': 'bitcoin',
-                'symbol': 'BTC',
-                'name': 'Bitcoin',
-                'logoUrl': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
-              },
-            ),
-          ),
-          _buildNavItem(
-            context,
             'assets/images/svg/receipt.svg',
             'Activity',
-            currentIndex == 3,
+            currentIndex == 2,
             () => context.go(AppRouter.myTrades),
           ),
           _buildNavItem(
             context,
             'assets/images/svg/empty-wallet.svg',
             'Wallets',
-            currentIndex == 4,
+            currentIndex == 3,
             () => context.go(AppRouter.wallet),
           ),
 

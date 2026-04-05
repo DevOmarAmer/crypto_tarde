@@ -24,4 +24,5 @@ abstract class TradeRepository {
   });
 
   Future<double> getVirtualBalance();
+  Future<double> getOwnedQuantity(String coinId);
 }

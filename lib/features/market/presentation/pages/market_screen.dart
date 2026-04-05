@@ -5,6 +5,49 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/market_cubit.dart';
 import '../widgets/market_coin_tile.dart';
 import '../widgets/market_skeleton_tile.dart';
+import '../../domain/entities/coin_entity.dart';
+
+// ── Tab definition ────────────────────────────────────────────────────────────
+
+enum _MarketTab { all, gainers, losers, top }
+
+extension _MarketTabExt on _MarketTab {
+  String get label {
+    switch (this) {
+      case _MarketTab.all:
+        return 'All';
+      case _MarketTab.gainers:
+        return 'Gainers';
+      case _MarketTab.losers:
+        return 'Losers';
+      case _MarketTab.top:
+        return 'Top';
+    }
+  }
+
+  List<CoinEntity> filter(List<CoinEntity> coins) {
+    switch (this) {
+      case _MarketTab.all:
+        return coins;
+      case _MarketTab.gainers:
+        return [...coins.where((c) => c.priceChangePercentage24h > 0)]..sort(
+          (a, b) =>
+              b.priceChangePercentage24h.compareTo(a.priceChangePercentage24h),
+        );
+      case _MarketTab.losers:
+        return [...coins.where((c) => c.priceChangePercentage24h < 0)]..sort(
+          (a, b) =>
+              a.priceChangePercentage24h.compareTo(b.priceChangePercentage24h),
+        );
+      case _MarketTab.top:
+        final sorted = [...coins]
+          ..sort((a, b) => b.marketCap.compareTo(a.marketCap));
+        return sorted.take(10).toList();
+    }
+  }
+}
+
+// ── Screen ────────────────────────────────────────────────────────────────────
 
 class MarketScreen extends StatefulWidget {
   const MarketScreen({super.key});
@@ -14,9 +57,7 @@ class MarketScreen extends StatefulWidget {
 }
 
 class _MarketScreenState extends State<MarketScreen> {
-  int _selectedTabIndex = 1; // Default: 'Spot'
-  final List<String> _tabs = ['Convert', 'Spot', 'Margin', 'Fiat'];
-
+  _MarketTab _selectedTab = _MarketTab.all;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -33,11 +74,13 @@ class _MarketScreenState extends State<MarketScreen> {
     super.dispose();
   }
 
-  /// Trigger load-more when the user is 200 px from the bottom.
+  /// Trigger load-more when the user is 200 px from the bottom
+  /// (only relevant in the "All" tab where pagination is active).
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    final threshold =
-        _scrollController.position.maxScrollExtent - 200;
+    if (_selectedTab != _MarketTab.all)
+      return; // no pagination for filtered tabs
+    final threshold = _scrollController.position.maxScrollExtent - 200;
     if (_scrollController.offset >= threshold) {
       context.read<MarketCubit>().loadMoreCoins();
     }
@@ -51,26 +94,25 @@ class _MarketScreenState extends State<MarketScreen> {
         child: Column(
           children: [
             const CustomAppBar(),
-            _buildCustomTabBar(),
+            _buildTabBar(),
             const SizedBox(height: 8),
             Expanded(
               child: BlocBuilder<MarketCubit, MarketState>(
                 builder: (context, state) {
-                  // ── Initial / full-screen loading -> shimmer skeleton ────
                   if (state is MarketInitial || state is MarketLoading) {
                     return const MarketSkeletonList();
                   }
 
-                  // ── Error (no data at all) ────────────────────────────
                   if (state is MarketError) {
                     return _buildErrorView(context);
                   }
 
-                  // ── Data ready ────────────────────────────────────────
                   if (state is MarketLoaded) {
-                    final coins = state.filteredCoins;
+                    // Apply search filter first, then tab filter.
+                    final baseCoins = state.filteredCoins;
+                    final tabCoins = _selectedTab.filter(baseCoins);
 
-                    if (coins.isEmpty) {
+                    if (tabCoins.isEmpty) {
                       return Center(
                         child: Text(
                           state.searchQuery.isNotEmpty
@@ -84,6 +126,9 @@ class _MarketScreenState extends State<MarketScreen> {
                       );
                     }
 
+                    // Pagination footer only makes sense for the "All" tab.
+                    final showFooter = _selectedTab == _MarketTab.all;
+
                     return RefreshIndicator(
                       onRefresh: () =>
                           context.read<MarketCubit>().fetchMarketCoins(),
@@ -93,13 +138,12 @@ class _MarketScreenState extends State<MarketScreen> {
                         controller: _scrollController,
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.only(bottom: 120),
-                        // +1 for the footer (loading indicator or Add Fav button)
-                        itemCount: coins.length + 1,
+                        itemCount: tabCoins.length + (showFooter ? 1 : 0),
                         itemBuilder: (context, index) {
-                          if (index < coins.length) {
-                            return MarketCoinTile(coin: coins[index]);
+                          if (index < tabCoins.length) {
+                            return MarketCoinTile(coin: tabCoins[index]);
                           }
-                          // Footer
+                          // Footer (only in "All" tab)
                           return state.isLoadingMore
                               ? _buildLoadMoreIndicator()
                               : _buildAddFavoriteButton();
@@ -118,8 +162,9 @@ class _MarketScreenState extends State<MarketScreen> {
     );
   }
 
-  // ── Custom Tab Bar ──────────────────────────────────────────────────────────
-  Widget _buildCustomTabBar() {
+  // ── Tab Bar ────────────────────────────────────────────────────────────────
+
+  Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       padding: const EdgeInsets.all(4.0),
@@ -128,42 +173,42 @@ class _MarketScreenState extends State<MarketScreen> {
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: List.generate(_tabs.length, (index) {
-          final isActive = _selectedTabIndex == index;
+        children: _MarketTab.values.map((tab) {
+          final isActive = _selectedTab == tab;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _selectedTabIndex = index),
+              onTap: () => setState(() => _selectedTab = tab),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
                 decoration: BoxDecoration(
-                  color:
-                      isActive ? const Color(0xFF1E2329) : Colors.transparent,
+                  color: isActive
+                      ? const Color(0xFF1E2329)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _tabs[index],
+                  tab.label,
                   style: TextStyle(
                     color: isActive
                         ? AppColors.textPrimary
                         : AppColors.textSecondary,
                     fontSize: 14,
-                    fontWeight:
-                        isActive ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ),
             ),
           );
-        }),
+        }).toList(),
       ),
     );
   }
 
-  // ── "Load more" spinner between pages ──────────────────────────────────────
+  // ── "Load more" spinner ────────────────────────────────────────────────────
+
   Widget _buildLoadMoreIndicator() {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 24.0),
@@ -180,7 +225,8 @@ class _MarketScreenState extends State<MarketScreen> {
     );
   }
 
-  // ── Add Favourite button shown when all pages are loaded ───────────────────
+  // ── Add Favourite button ───────────────────────────────────────────────────
+
   Widget _buildAddFavoriteButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
@@ -199,8 +245,11 @@ class _MarketScreenState extends State<MarketScreen> {
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_circle_outline,
-                  color: AppColors.textSecondary, size: 20),
+              Icon(
+                Icons.add_circle_outline,
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
               SizedBox(width: 8),
               Text(
                 'Add Favorite',
@@ -218,6 +267,7 @@ class _MarketScreenState extends State<MarketScreen> {
   }
 
   // ── Error view ─────────────────────────────────────────────────────────────
+
   Widget _buildErrorView(BuildContext context) {
     return Center(
       child: Column(
